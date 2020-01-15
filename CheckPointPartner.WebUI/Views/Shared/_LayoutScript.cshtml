@@ -1,0 +1,59 @@
+﻿<script>
+
+    $(document).ready(function () {
+        $(function () {
+            window.FakeLoader.init();
+        });
+    });
+
+    window.FakeLoader.init({
+        auto_hide: true,
+        fade_timeout: 200,
+        overlay_id: 'fakeloader-overlay',
+        wait_for_images: true,
+        wait_for_images_selector: 'body'
+    });
+</script>
+
+<script>
+
+    function OpenModalInput(p_sActionName) {
+        $("#spnActionName").html(p_sActionName);
+
+        $("#mdlInput").modal('show');
+    }
+
+    function CloseModalInput(p_sDataTableName) {
+        if (p_sDataTableName !== undefined || p_sDataTableName !== null) {
+            RefreshDataTable(p_sDataTableName);
+        }
+
+        $("#mdlInput").modal('hide');
+    }
+
+    function fClearInput(pDefaultSelect) {
+        $("#frmInput").find("select, input, textarea").each(function () {
+            if (this.type === "select-one") {
+                $("#" + this.name).val(pDefaultSelect);
+            } else {
+                $("#" + this.name).val("");
+            }
+        });
+    }
+
+    function fLockInput(bState) {
+        $("#frmInput").find("select, input, textarea").each(function () {
+            $(this).attr("readonly", bState);
+        });
+    }
+
+    function fFillInputWithJsonData(oJsonData) {
+        $("#frmInput").find("select, input, textarea").each(function () {
+            $("#" + this.name).val(oJsonData[this.name].toString())
+        });
+    }
+
+    function fFormatNumber(num) {
+        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+    }
+</script>

@@ -1,0 +1,382 @@
+﻿@using CheckPointPartner.WebUI.Model;
+
+@model IUsers
+@{
+    ViewData["Title"] = "My Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string sUserImage = string.IsNullOrEmpty(Model.UserDetail.UserImage) ? "no_photo.png" : Model.UserDetail.UserImage + ".jpeg";
+    string sPartnerImage = string.IsNullOrEmpty(Model.UserDetail.PartnerImage) ? "no_image_rectangle.png" : Model.UserDetail.PartnerImage + ".jpeg";
+}
+
+@section AdditionalHeaderScript
+{
+    <link rel="stylesheet" href="@Url.Content("~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Assets/plugins/timepicker/bootstrap-timepicker.min.css")">
+}
+
+<style type="text/css">
+    .image-preview-input {
+        position: relative;
+        overflow: hidden;
+        margin: 0px;
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+    }
+
+        .image-preview-input input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin: 0;
+            padding: 0;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            filter: alpha(opacity=0);
+        }
+
+    .image-preview-input-title {
+        margin-left: 2px;
+    }
+</style>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-Device"></i>&nbsp;@ViewBag.Title
+        <small></small>
+    </h1>
+</section>
+
+<section class="content">
+    @using (Html.BeginForm("UpdateProfile", "Profile", FormMethod.Post, new { id = "frmProfile", enctype = "multipart/form-data", autocomplete = "off" }))
+    {
+        <div class="row">
+            <div class="col-md-3">
+                <div class="box box-primary">
+                    <div class="box-body box-profile">
+                        <img class="profile-user-img img-responsive img-circle" src="@Url.Content("~/Assets/dist/img/user/" + sUserImage)" alt="User profile picture">
+                        <h3 class="profile-username text-center">@(string.IsNullOrEmpty(Model.UserDetail.Name) ? Model.UserName : Model.UserDetail.Name)</h3>
+                        <p class="text-muted text-center">@(string.IsNullOrEmpty(Model.UserDetail.PartnerName) ? "- No Partner -" : Model.UserDetail.PartnerName)</p>
+
+                        <ul class="list-group list-group-unbordered">
+                            <li class="list-group-item">
+                                <b>E-Mail</b> <a class="pull-right">@Model.Email</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Phone Number</b> <a class="pull-right">@(string.IsNullOrEmpty(Model.PhoneNumber) ? " - No Phone Number - " : Model.PhoneNumber)</a>
+                            </li>
+                        </ul>
+
+                        <a onclick="fOpen()" class="btn btn-primary btn-block btn-flat"><b>Change Password</b></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+
+                @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.UserDetail.UserDetailId)
+                @Html.HiddenFor(model => model.UserDetail.AspNetUserId)
+                @Html.HiddenFor(model => model.UserDetail.IsActive)
+                @Html.HiddenFor(model => model.UserDetail.IsDeleted)
+                @Html.HiddenFor(model => model.UserDetail.CreateDate)
+                @Html.HiddenFor(model => model.UserDetail.CreateByUserId)
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="box box-primary">
+                                    <div class="box-header">
+                                        <label>User Information</label>
+                                    </div>
+                                    <div class="box-body no-padding">
+                                        <div class="col-md-3 no-padding">
+                                            <div class="form-group col-md-12">
+                                                <label>
+                                                    User Image
+                                                </label>
+                                                <img class="profile-user-img img-responsive" id="imgUser" style="width:100% !important; margin-bottom:10px !important" src="@Url.Content("~/Assets/dist/img/user/" + sUserImage)" alt="User Photo">
+
+                                                <!-- image-preview-filename input [CUT FROM HERE]-->
+                                                <div id="usrImagePreview" class="input-group image-preview">
+                                                    @Html.TextBoxFor(model => model.UserDetail.UserImage, new { @class = "form-control image-preview-filename", @readonly = "true" })
+
+                                                    <span class="input-group-btn">
+                                                        <!-- image-preview-clear button -->
+                                                        <button id="btnClearUserPhoto" type="button" class="btn btn-default btn-flat image-preview-clear" style="display:none;">
+                                                            <span class="glyphicon glyphicon-remove"></span> Clear
+                                                        </button>
+                                                        <!-- image-preview-input -->
+                                                        <div class="btn btn-default btn-flat image-preview-input">
+                                                            <span class="glyphicon glyphicon-folder-open"></span>
+                                                            <span id="btnBrowseUserTitle" class="image-preview-input-title">Browse</span>
+                                                            <input id="fileUserPhoto" type="file" accept="image/jpeg" name="fileUserPhoto" />
+                                                        </div>
+                                                    </span>
+                                                </div>
+                                                <!-- /input-group image-preview [TO HERE]-->
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-9">
+                                            <div class="form-group col-md-12">
+                                                <label>
+                                                    Full Name
+                                                </label>
+                                                @Html.TextBoxFor(model => model.UserDetail.Name, new { @placeholder = "Nama", @class = "form-control", @required = "true" })
+                                            </div>
+                                            <div class="form-group col-md-12">
+                                                <label>
+                                                    Phone Number
+                                                </label>
+                                                @Html.TextBoxFor(model => model.UserDetail.PhoneNumber, new { @placeholder = "Phone Number", @class = "form-control", @required = "true" })
+                                            </div>
+                                            <div class="form-group col-md-12">
+                                                <label>
+                                                    User Name
+                                                </label>
+                                                @Html.TextBoxFor(model => model.UserName, new { @placeholder = "Nama Pengguna", @class = "form-control", @required = "true" })
+                                            </div>
+                                            <div class="form-group col-md-12">
+                                                <label>
+                                                    E-Mail
+                                                </label>
+                                                @Html.TextBoxFor(model => model.Email, new { @placeholder = "Email", @class = "form-control", @required = "true", @type = "email" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.UserDetail.PartnerId > 0)
+                        {
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="box box-primary">
+                                        <div class="box-header">
+                                            <label>Partner Information</label>
+                                        </div>
+                                        <div class="box-body no-padding">
+                                            <div class="col-md-3 no-padding">
+                                                <div class="form-group col-md-12">
+                                                    <label>
+                                                        Partner Image
+                                                    </label>
+                                                    <img class="profile-user-img img-responsive" id="imgPartner" style="width:100% !important; margin-bottom:10px !important" src="@Url.Content("~/Assets/dist/img/user/" + sPartnerImage)" alt="Partner Photo">
+
+                                                    <!-- image-preview-filename input [CUT FROM HERE]-->
+                                                    <div id="usrImagePreview" class="input-group image-preview">
+                                                        @Html.TextBoxFor(model => model.UserDetail.PartnerImage, new { @class = "form-control image-preview-filename", @readonly = "true" })
+
+                                                        <span class="input-group-btn">
+                                                            <!-- image-preview-clear button -->
+                                                            <button id="btnClearPartnerPhoto" type="button" class="btn btn-default btn-flat image-preview-clear" style="display:none;">
+                                                                <span class="glyphicon glyphicon-remove"></span> Clear
+                                                            </button>
+                                                            <!-- image-preview-input -->
+                                                            <div class="btn btn-default btn-flat image-preview-input">
+                                                                <span class="glyphicon glyphicon-folder-open"></span>
+                                                                <span id="btnBrowsePartnerTitle" class="image-preview-input-title">Browse</span>
+                                                                <input id="filePartnerPhoto" type="file" accept="image/jpeg" name="filePartnerPhoto" />
+                                                            </div>
+                                                        </span>
+
+                                                    </div>
+                                                    <!-- /input-group image-preview [TO HERE]-->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-9">
+                                                <div class="form-group col-md-12">
+                                                    <label>
+                                                        Nama Partner
+                                                    </label>
+                                                    @Html.TextBoxFor(model => model.UserDetail.PartnerName, new { @placeholder = "Nama", @class = "form-control", @required = "true", })
+                                                </div>
+                                                <div class="form-group col-md-12">
+                                                    <label>
+                                                        Alamat Partner
+                                                    </label>
+                                                    @Html.TextAreaFor(model => model.UserDetail.PartnerAddress, new { @rows = 5, @placeholder = "Alamat", @class = "form-control", @required = "true" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button id="btnSubmit" type="submit" class="btn btn-success btn-flat pull-right" style="width:20% !important; margin-right:4px;">
+                                    <i class="fa fa-save"></i> &nbsp; Update Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+</section>
+
+@section mdlInput{
+    @Html.Partial("~/Views/Profile/_ChangePassword.cshtml", null)
+    @Html.Partial("~/Views/Profile/_ChangePasswordScript.cshtml", null)
+}
+
+@section AdditionalFooterScript
+{
+    <script type="text/javascript" src="@Url.Content("~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/plugins/timepicker/bootstrap-timepicker.min.js")"></script>
+
+    <script>
+        $('#frmProfile').submit(function (e) {
+            e.preventDefault();
+
+            var form = $(this)[0];
+            var data = new FormData(form);
+
+            $.ajax({
+            url: '@Url.Action("UpdateProfile", "Profile")',
+            data: data,
+            type: "POST",
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            cache: false,
+            timeout: 600000,
+                success: function (data) {
+                    if (data["isSuccess"]) {
+                        swal({
+                            title: "Success...",
+                            text: data["message"],
+                            type: 'success'
+                        }).then(function () {
+                            $(location).attr('href', '@Url.Action("Index","Dashboard")')
+                        })
+                    } else {
+                        swal({
+                            title: "Oops, Something wrong with your Request\n\n Reference Number : " + data["referenceNumber"] + "\n\n",
+                            text: "Please safe the Reference Number and call your System Administrator.",
+                            type: 'warning'
+                        })
+                    }
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: window.location.href,
+                        text: "( Error " + xhr.status + " ) - " + error,
+                        type: 'warning'
+                    }).then(function () {
+                    })
+                }
+            });
+            return false;
+        });
+    </script>
+
+    <script id="UserPhoto">
+        $(function () {
+            // Create the close button
+            var closebtn = $('<button/>', {
+                type: "button",
+                text: 'x',
+                id: 'close-preview-user-image',
+                style: 'font-size: initial;',
+            });
+            closebtn.attr("class", "close pull-right");
+
+            // Set the popover default content
+            $('#usrImagePreview').popover({
+                trigger: 'manual',
+                html: true,
+                title: "<strong>Preview</strong>" + $(closebtn)[0].outerHTML,
+                content: "There's no image",
+                placement: 'bottom'
+            });
+
+            // Clear event
+            $('#btnClearUserPhoto').click(function () {
+                var img = $('#imgUser');
+
+                img.attr('src', '@Url.Content("~/Assets/dist/img/user/no_photo.png")');
+                $('#PasPhoto').val("");
+                $('#btnClearUserPhoto').hide();
+                $('#fileUserPhoto').val("");
+                $('#btnBrowseUserTitle').text("Browse");
+
+            });
+
+            // Create the preview image
+            $("#fileUserPhoto").change(function () {
+                var img = $('#imgUser');
+                var file = this.files[0];
+                var reader = new FileReader();
+                // Set preview image into the popover data-content
+                reader.onload = function (e) {
+                    $('#btnBrowseUserTitle').text("Change");
+                    $("#btnClearUserPhoto").show();
+                    $("#PasPhoto").val(file.name);
+                    img.attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+
+    <script id="PartnerPhoto">
+        $(function () {
+            // Create the close button
+            var closebtn = $('<button/>', {
+                type: "button",
+                text: 'x',
+                id: 'close-preview-partner-image',
+                style: 'font-size: initial;',
+            });
+            closebtn.attr("class", "close pull-right");
+
+            // Set the popover default content
+            $('#usrImagePreview').popover({
+                trigger: 'manual',
+                html: true,
+                title: "<strong>Preview</strong>" + $(closebtn)[0].outerHTML,
+                content: "There's no image",
+                placement: 'bottom'
+            });
+
+            // Clear event
+            $('#btnClearPartnerPhoto').click(function () {
+                var img = $('#imgPartner');
+
+                img.attr('src', '@Url.Content("~/Assets/dist/img/user/" + Model.UserDetail.PartnerImage)');
+                $('#PartnerPicture').val("");
+                $('#btnClearPartnerPhoto').hide();
+                $('#filePartnerPhoto').val("");
+                $('#btnBrowsePartnerTitle').text("Browse");
+
+            });
+
+            // Create the preview image
+            $("#filePartnerPhoto").change(function () {
+                var img = $('#imgPartner');
+                var file = this.files[0];
+                var reader = new FileReader();
+                // Set preview image into the popover data-content
+                reader.onload = function (e) {
+                    $('#btnBrowsePartnerTitle').text("Change");
+                    $("#btnClearPartnerPhoto").show();
+                    $("#PartnerPicture").val(file.name);
+                    img.attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+}

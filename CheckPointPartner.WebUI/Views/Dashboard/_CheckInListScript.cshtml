@@ -1,0 +1,82 @@
+﻿<script id="CheckInListScript">
+    $(document).ready(function () {
+        $("#mdlInputDialog").width("100%");
+    });
+    
+    $('#tblCheckInList').DataTable({
+        "ajax": {
+            "url": "@Url.Action("CheckInListAsync", "Dashboard")",
+            "type": "POST",
+            "data": function (d) {
+                d.p_iIdPartner = $("#spnPartnerId").html();
+                d.p_sKeyword = $("#txtKeyword").val();
+            },
+        },
+        "columns": [
+            {
+                "title": "Id",
+                "data": "rowNumber",
+                className: "hidden",
+            },
+            //{
+            //    "title": "Action",
+            //    className: "dt-col-center",
+            //    render: function (d) {
+            //        var sReturn = '';
+            //            sReturn += "<a onclick = 'fShowDetail(this)' class='btn btn-success btn-sm btn-flat fa fa-eye'></a> ";
+            //        return sReturn;
+            //    },
+            //},
+            {
+                "title": "Kode Uang Jalan",
+                "data": "kodeUangJalan",
+            },
+            {
+                "title": "Nama Rumah Makan",
+                "data": "namaRumahMakan",
+            },
+            {
+                "title": "Tag Number",
+                "data": "crewTagNo",
+            },
+            {
+                "title": "Nama Crew",
+                "data": "crewName",
+            },
+            {
+                "title": "Posisi",
+                "data": "crewPosition",
+            },
+            {
+                "title": "Sudah Absen",
+                "data": "crewIsCheckedIn",
+            },
+        ],
+        "processing": true,
+        "serverSide": true,
+        "lengthMenu": [[5], [5]],
+        "filter": false,
+        "sort": false,
+        "orderMulti": false
+    });
+
+    function fShowInfo() {
+        swal({
+            title: "Maaf ya Bro or Sis\n Fungsi yang ini belum selesai \n\n",
+            text: "Btw, sesungguhnya tuhan bersama orang-orang yang sabar, :D",
+            type: 'warning'
+        })
+    }
+
+    function fShowInfo(p_sPartnerName) {
+        OpenModalInput('')
+        $("#spnPartnerId").html(p_sPartnerName.split('|')[0]);
+        $("#spnPartnerName").html(p_sPartnerName.split('|')[1]);
+
+        RefreshDataTable('tblCheckInList');
+    }
+    
+    function fClose() {
+        $("#mdlInput").modal('hide');
+    }
+</script>

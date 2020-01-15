@@ -1,0 +1,112 @@
+﻿@using CheckPointPartner.WebUI.Models
+@{
+    Layout = "";
+    ViewData["Title"] = "Login";
+}
+@model LoginModel
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>GiTTerns | Log in</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="~/Assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/Assets/bower_components/Ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="~/Assets/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="~/Assets/plugins/iCheck/square/blue.css">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+</head>
+<body class="hold-transition login-page" style="background-color:#d2d6de">
+    <div class="login-box">
+        <div class="login-logo">
+            <div class="col-md-12">
+                <img src="@Url.Content("~/Assets/dist/img/images/gitterns.png")" style="width:50%!important; margin-top:20px!important">
+                <br />
+                <a href="~/Assets/index2.html" style="color:#444!important"><b>GiTT</b>erns</a>
+            </div>
+        </div>
+
+        <!-- /.login-logo -->
+        <div class="login-box-body">
+            <p class="login-box-msg">Sign in to start your session</p>
+
+            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "frmLogin", enctype = "multipart/form-data", autocomplete = "off" }))
+            {
+                <div class="form-group has-feedback">
+                    @Html.TextBoxFor(model => model.Email, new { @placeholder = "Username", @class = "form-control" })
+                    <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                </div>
+
+                <div class="form-group has-feedback">
+                    @Html.TextBoxFor(model => model.Password, new { @placeholder = "Password", @class = "form-control", @type = "password" })
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                </div>
+
+                <div class="row">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        @foreach (var item in ViewContext.ViewData.ModelState)
+                        {
+                            if (item.Value.Errors.Any())
+                            {
+                                <div class="col-md-12">
+                                    <a>@item.Key</a>
+                                    <a>@((item.Value == null || item.Value == null) ? "<null>" : item.Value.RawValue)</a>
+                                    <a>@(string.Join("; ", item.Value.Errors.Select(x => x.ErrorMessage)))</a>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-8">
+                        <div class="checkbox icheck">
+                            <label>
+                                @Html.CheckBoxFor(model => model.RememberMe)&nbsp;  Remember Me
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-4">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+                    </div>
+                </div>
+            }
+
+            @*<div class="social-auth-links text-center">
+            <p>- OR -</p>
+            <a href="#" class="btn btn-block btn-social btn-facebook btn-flat">
+                <i class="fa fa-facebook"></i> Sign in using
+                Facebook
+            </a>
+            <a href="#" class="btn btn-block btn-social btn-google btn-flat">
+                <i class="fa fa-google-plus"></i> Sign in using
+                Google+
+            </a>
+        </div>*@
+            <!-- /.social-auth-links -->
+            @*<a href="#">I forgot my password</a><br>
+        <a href="register.html" class="text-center">Register a new membership</a>*@
+
+        </div>
+        <!-- /.login-box-body -->
+    </div>
+    <script src="~/Assets/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="~/Assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/Assets/plugins/iCheck/icheck.min.js"></script>
+    <script>
+        $(function () {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%'
+            });
+        });
+    </script>
+</body>
+</html>
+

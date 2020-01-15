@@ -1,0 +1,196 @@
+﻿<script id="InputScript">
+
+    function fAdd() {
+        $("#dvUser").find("select, input, textarea").each(function () {
+            $(this).val("");
+            $(this).attr("readonly", false);
+            $(this).attr("disabled", false);
+        });
+        $("#dvUserDetail").find("select, input, textarea").each(function () {
+            $(this).val("");
+            $(this).attr("readonly", false);
+            $(this).attr("disabled", false);
+        });
+
+        $("#ddlRoleAccess").attr("readonly", false);
+        $("#ddlRoleAccess").attr("disabled", false);
+        $("#btnSubmit").show();
+        $("#dvNewRole").show();
+
+        $("#ddlRoleAccess").val("");
+        $("#EmployeeDetail").val("");
+
+        OpenModalInput('Add New')
+    }
+
+    function fEdit(senderButton) {
+        var row = $(senderButton).closest("TR");
+        var iId = $("TD", row).eq(0).html();
+        
+        $("#dvUser").find("select, input, textarea").each(function () {
+            $(this).attr("readonly", false);
+            $(this).attr("disabled", false);
+        });
+        $("#dvUserDetail").find("select, input, textarea").each(function () {
+            $(this).attr("readonly", false);
+            $(this).attr("disabled", false);
+        });
+
+        $("#ddlRoleAccess").attr("readonly", false);
+        $("#ddlRoleAccess").attr("disabled", false);
+        $("#btnSubmit").show();
+        $("#dvNewRole").show();
+
+        $("#EmployeeDetail").attr("readonly", true);
+
+        Get(iId, "Edit");
+    }
+
+    function fShowDetail(senderButton) {
+        window.FakeLoader.init();
+        var row = $(senderButton).closest("TR");
+        var iId = $("TD", row).eq(0).html();
+
+        $("#frmInput").find("select, input, textarea").each(function () {
+            $(this).attr("readonly", true);
+            $(this).attr("disabled", true);
+        });
+        $("#btnValidate").hide();
+        $("#dvNewRole").hide();
+
+        $("#btnSubmit").hide();
+        var column = $("#tblAspNetUsersGroup").DataTable().column(1);
+        column.visible(false);
+
+        Get(iId, "Detail");
+    }
+
+    function fDelete(senderButton) {
+        var row = $(senderButton).closest("TR");
+        var iId = $("TD", row).eq(0).html();
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to undo this action!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Yes, I am sure!',
+            cancelButtonText: "No, cancel it!",
+        }).then(result =>
+        {
+            if (result.value) {
+                Delete(iId);
+            }
+        });
+    }
+
+    function Get(p_iId, p_sActionName) {
+        try {
+            $.ajax({
+                url: '@Url.Action("GetUser", "Users")',
+                type: "POST",
+                data: { p_iAspNetUsersId: p_iId },
+                success: function (data) {
+                    if (data["isSuccess"]) {
+                        var userObj = jQuery.parseJSON(data["jsonData"]);
+
+                        $("#dvUser").find("select, input, textarea").each(function () {
+                            if (this.name.toLowerCase().indexOf('date') > -1) {
+                                var date = new Date(userObj[this.name]);
+                                $("#" + this.name).val(moment(date).format("DD MMMM YYYY"))
+                            } else {
+                                $("#" + this.name).val(userObj[this.name])
+                            }
+                        });
+
+                        $("#dvUserDetail").find("select, input, textarea").each(function () {
+                            if (this.name.toLowerCase().indexOf('date') > -1) {
+                                var date = new Date(userObj.UserDetail[this.name.split('.')[1]]);
+                                $("#" + this.name.replace('.','_')).val(moment(date).format("DD MMMM YYYY"))
+                            } else {
+                                $("#" + this.name.replace('.','_')).val(userObj["UserDetail"][this.name.split('.')[1]])
+                            }
+                        });
+
+                        OpenModalInput(p_sActionName)
+                    } else {
+                        swal({
+                            title: "Oops, Something wrong with your Request\n\n Reference Number : " + data["referenceNumber"] + "\n\n",
+                            text: "Please safe the Reference Number and call your System Administrator.",
+                            type: 'warning'
+                        })
+                    }
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: window.location.href,
+                        text: "( Error " + xhr.status + " ) - " + error,
+                        type: 'warning'
+                    }).then(function () {
+                        CloseModalInput('tblAspNetUsersList');
+                    })
+                }
+            });
+        }
+        catch (err) {
+            swal({
+                title: 'From Catch',
+                text: err.message,
+                type: 'warning'
+            }).then(function () {
+                CloseModalInput('tblAspNetUsersList');
+            })
+        }
+    };
+
+    function Delete(p_iId) {
+        try {
+            $.ajax({
+                url: '@Url.Action("DeleteAsync", "Users")',
+                type: "DELETE",
+                data: { p_iAspNetUsersId: p_iId },
+                success: function (data) {
+                    if (data["isSuccess"]) {
+                        swal({
+                            title: 'Success!',
+                            text: data["message"],
+                            type: 'success'
+                        }).then
+                            (function () {
+                                RefreshDataTable('tblAspNetUsersList');
+                            });
+                    } else {
+                        swal({
+                            title: "Oops, Something wrong with your Request\n\n Reference Number : " + data["referenceNumber"] + "\n\n",
+                            text: "Please safe the Reference Number and call your System Administrator.",
+                            type: 'warning'
+                        })
+                    }
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: window.location.href,
+                        text: "( Error " + xhr.status + " ) - " + error,
+                        type: 'warning'
+                    })
+                }
+            });
+        }
+        catch (err) {
+            swal({
+                title: 'From Catch',
+                text: err.message,
+                type: 'warning'
+            }).then(function () {
+                CloseModalInput('tblAspNetUsersList');
+            })
+        }
+    };
+    
+    function fClose() {
+        CloseModalInput('tblAspNetUsersList');
+        RefreshDataTable('tblRoleAccess');
+    }
+
+</script>

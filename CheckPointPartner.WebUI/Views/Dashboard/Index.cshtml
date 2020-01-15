@@ -1,0 +1,58 @@
+﻿@using CheckPointPartner.WebUI.Model
+@using CheckPointPartner.WebUI.Data
+
+@inject UsersContext _userContext
+@{
+    ViewData["Title"] = "Dashboard";
+
+}
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-Device"></i>&nbsp;@ViewBag.Title
+        <small>GiTTerns Check Point Partner</small>
+    </h1>
+</section>
+
+@section AdditionalHeaderScript
+{
+    <link rel="stylesheet" href="@Url.Content("~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Assets/plugins/timepicker/bootstrap-timepicker.min.css")">
+}
+
+<section class="content">
+    <div class="row">
+        @{
+            foreach (Partner partner in _userContext.Partners.OrderBy(o => o.PartnerName))
+            {
+                <div class="col-md-4 col-xs-6">
+                    <!-- small box -->
+                    <div class="small-box" style="background-color:#@RD.Lib.RDRandom.RandomNumber(556677, 599999)">
+                        <div class="inner">
+                            <h3 style="color:white">@partner.PartnerName</h3>
+
+                            <p style="color:white; margin:0!important">Total Check In : @_userContext.CheckIns.Where(o => o.EmailRumahMakan == partner.PartnerEmail).Count()</p>
+                            <p style="color:white; margin:0!important">Belum Check In : @_userContext.CheckIns.Where(o => o.EmailRumahMakan == partner.PartnerEmail && o.CrewIsCheckedIn == false).Count()</p>
+                            <p style="color:white; margin:0!important">Sudah Check In : @_userContext.CheckIns.Where(o => o.EmailRumahMakan == partner.PartnerEmail && o.CrewIsCheckedIn == true).Count()</p>
+                        </div>
+                        <a href="#" onclick="fShowInfo('@partner.PartnerId|@partner.PartnerName')" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</section>
+
+@section mdlInput
+{
+    @Html.Partial("~/Views/Dashboard/_CheckInList.cshtml", null)
+    @Html.Partial("~/Views/Dashboard/_CheckInListScript.cshtml", null)
+}
+
+@section AdditionalFooterScript
+{
+    <script type="text/javascript" src="@Url.Content("~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/plugins/timepicker/bootstrap-timepicker.min.js")"></script>
+}
+

@@ -1,0 +1,55 @@
+﻿
+<div class="modal-header">
+    <div class="box-body">
+        <h3>
+            <span style="display:none" id="spnPartnerId"></span>
+            <i class="fa fa-user"></i>&nbsp;&nbsp;Detail of <span id="spnPartnerName"></span>
+        </h3>
+    </div>
+</div>
+
+<div class="modal-body" style="max-height: calc(100vh - 240px) !important; overflow-y: auto !important;">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h4 class="box-title"> <i class="fa fa-search"></i>&nbsp;  Filter </h4>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="form-group col-md-12">
+                        <label>Keyword</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                            <input type="text" id="txtKeyword" name="p_sKeyword" class="form-control" placeholder="Keyword..." onkeyup="RefreshDataTable('tblCheckInList')">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2 pull-right">
+                        <a style="width:100%" class="btn btn-success btn-flat" onclick="ResetFilter()"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Reset Filter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table id="tblCheckInList"
+                   style="width:100%"
+                   class="table table-bordered table-striped dataTable no-footer"
+                   role="grid">
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <div class="form-group col-md-12" style="text-align:right !important;">
+        <button type="button" class="btn btn-default btn-flat" style="width:20% !important; margin-left:4px;" onclick="fClose()">
+            <i class="fa fa-close"></i> &nbsp; Close
+        </button>
+    </div>
+</div>

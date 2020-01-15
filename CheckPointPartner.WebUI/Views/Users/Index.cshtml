@@ -1,0 +1,272 @@
+﻿@*@using CheckPointPartner.Common
+    @using CheckPointPartner.Services
+
+    @inject ISecurity Security*@
+
+@{
+    ViewData["Title"] = "Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section AdditionalHeaderScript
+{
+    <link rel="stylesheet" href="@Url.Content("~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Assets/plugins/timepicker/bootstrap-timepicker.min.css")">
+}
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-Device"></i>&nbsp;@ViewBag.Title
+        <small></small>
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h4 class="box-title"> <i class="fa fa-search"></i>&nbsp;  Filter </h4>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="form-group col-md-12">
+                        <label>Keyword</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                            <input type="text" id="txtKeyword" name="p_sKeyword" class="form-control" placeholder="Keyword..." onkeyup="RefreshDataTable('tblAspNetUsersList')">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2 pull-right">
+                        <a style="width:100%" class="btn btn-success btn-flat" onclick="ResetFilter()"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Reset Filter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-bottom:10px !important;">
+        <div class="col-md-2">
+            <a class="btn btn-block btn-primary btn-flat" onclick="fAdd()" data-toggle="modal"><i class="fa fa-plus-square"></i>&nbsp;&nbsp;New User</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table id="tblAspNetUsersList"
+                                   style="width:100%"
+                                   class="table table-bordered table-striped dataTable no-footer"
+                                   role="grid">
+                            </table>
+                        </div>
+
+                        <script>
+
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section mdlInput{
+    @Html.Partial("~/Views/Users/_InputForm.cshtml", null)
+    @Html.Partial("~/Views/Users/_InputScript.cshtml", null)
+}
+
+@section AdditionalFooterScript
+{
+    <script type="text/javascript" src="@Url.Content("~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/plugins/timepicker/bootstrap-timepicker.min.js")"></script>
+
+    <script id="DataTableScript">
+
+        function ResetFilter() {
+            $("#txtKeyword").val("");
+            RefreshDataTable("tblAspNetUsersList");
+        }
+
+        $(document).ready(function () {
+            $("#mdlInputDialog").width("80%");
+            fLoadUserList();
+            fLoadRoleAccess();
+        });
+
+        function fLoadUserList() {
+            $('#tblAspNetUsersList').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("UsersListAsync", "Users")",
+                    "type": "POST",
+                    "data": function (d) {
+                        d.p_sKeyword = $("#txtKeyword").val();
+                    },
+                },
+                "columns": [
+                    {
+                        "title": "Id",
+                        "data": "id",
+                        className: "hidden",
+                    },
+                    {
+                        "title": "Action",
+                        "width": "15%",
+                        className: "dt-col-center",
+                        render: function (d) {
+                            var sReturn = '';
+                                sReturn += "<a onclick = 'fShowDetail(this)' class='btn btn-success btn-sm btn-flat fa fa-eye'></a> ";
+                                sReturn += "<a onclick = 'fEdit(this)' class='btn btn-warning btn-sm btn-flat fa fa-edit'></a> ";
+                                sReturn += "<a onclick = 'fDelete(this)' class='btn btn-danger btn-sm btn-flat fa fa-close'></a> ";
+                            return sReturn;
+                        },
+                    },
+                    {
+                        "title": "Username",
+                        "data": "userName",
+                    },
+                ],
+                "processing": true,
+                "serverSide": true,
+                "lengthMenu": [[10, 20, 50, 100], [10, 20, 50, 100]],
+                "filter": false,
+                "sort": false,
+                "orderMulti": false
+            });
+        };
+
+        function fLoadRoleAccess(id) {
+            $('#tblRoles').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("RolesList", "Users")",
+                    "type": "POST",
+                    "data": function (d) {
+                        d.p_iId = $("#Id").val();
+                        d.p_sKeyword = $("#txtKeyword").val();
+                    },
+                },
+                "columns": [
+                    {
+                        "title": "Id",
+                        "data": "id",
+                        className: "hidden",
+                    },
+                    {
+                        "title": "Action",
+                        "width": "5%",
+                        className: "dt-col-center",
+                        render: function (d) {
+                            var sResults = '';
+                            if ($("#spnActionName").html() != 'Detail') {
+                                sResults = "<a onclick = 'fDeleteRole(this)' class='btn btn-danger btn-sm btn-flat fa fa-close'></a>";
+                            }
+                            return sResults;
+                        },
+                    },
+                    {
+                        "title": "Role Name",
+                        "data": "name",
+                    },
+                ],
+                "processing": true,
+                "serverSide": true,
+                "lengthMenu": [[10, 20, 50, 100], [10, 20, 50, 100]],
+                "filter": false,
+                "paging":false,
+                "info":false,
+                "sort": false,
+                "orderMulti": false
+            });
+        };
+
+        function fAddRole() {
+            var ddlRoleAccess = $("#ddlRoleAccess");
+
+            try {
+                $.ajax({
+                    url: '@Url.Action("AddRoleAccess", "Users")',
+                    type: "POST",
+                    data: { p_iRoleId: ddlRoleAccess.val() },
+                    success: function (data) {
+                        if (data["isSuccess"]) {
+                            RefreshDataTable('tblRoles');
+                        } else {
+                            swal({
+                                title: "Oops...",
+                                text: data["message"],
+                                type: 'warning'
+                            })
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        swal({
+                            title: window.location.href,
+                            text: "( Error " + xhr.status + " ) - " + error,
+                            type: 'warning'
+                        }).then(function () {
+                            CloseModalInput('tblAspNetUsersList');
+                        })
+                    }
+                });
+            }
+            catch (err) {
+                swal({
+                    title: 'From Catch',
+                    text: err.message,
+                    type: 'warning'
+                }).then(function () {
+                    CloseModalInput('tblAspNetUsersList');
+                })
+            }
+        }
+
+        function fDeleteRole(senderButton) {
+            var row = $(senderButton).closest("TR");
+            var iId = $("TD", row).eq(0).html();
+
+            try {
+                $.ajax({
+                    url: '@Url.Action("DeleteRoleAccess", "Users")',
+                    type: "POST",
+                    data: { p_iRoleId: iId },
+                    success: function (data) {
+                        if (data["isSuccess"]) {
+                            RefreshDataTable('tblRoles');
+                        } else {
+                            swal({
+                                title: "Oops...",
+                                text: data["message"],
+                                type: 'warning'
+                            })
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        swal({
+                            title: window.location.href,
+                            text: "( Error " + xhr.status + " ) - " + error,
+                            type: 'warning'
+                        }).then(function () {
+                            CloseModalInput('tblAspNetUsersList');
+                        })
+                    }
+                });
+            }
+            catch (err) {
+                swal({
+                    title: 'From Catch',
+                    text: err.message,
+                    type: 'warning'
+                }).then(function () {
+                    CloseModalInput('tblAspNetUsersList');
+                })
+            }
+            }
+
+    </script>
+}

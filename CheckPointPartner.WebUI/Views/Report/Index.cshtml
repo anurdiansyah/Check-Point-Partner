@@ -1,0 +1,160 @@
+﻿@*@using CheckPointPartner.Common
+    @using CheckPointPartner.Services
+
+    @inject ISecurity Security*@
+
+@{
+    ViewData["Title"] = "Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section AdditionalHeaderScript
+{
+    <link rel="stylesheet" href="@Url.Content("~/Assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Assets/plugins/timepicker/bootstrap-timepicker.min.css")">
+}
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-Device"></i>&nbsp;@ViewBag.Title
+        <small></small>
+    </h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-header">
+                    <h4 class="box-title"> <i class="fa fa-search"></i>&nbsp;  Filter </h4>
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <div class="form-group col-md-12">
+                        <label>Keyword</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                            <input type="text" id="txtKeyword" name="p_sKeyword" class="form-control" placeholder="Keyword..." onkeyup="RefreshDataTable('tblCheckInReportList')">
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2 pull-right">
+                        <a style="width:100%" class="btn btn-success btn-flat" onclick="ResetFilter()"><i class="fa fa-refresh"></i>&nbsp;&nbsp;Reset Filter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box">
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table id="tblCheckInReportList"
+                                   style="width:100%"
+                                   class="table table-bordered table-striped dataTable no-footer"
+                                   role="grid"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section mdlInput{
+    @Html.Partial("~/Views/Report/_InputForm.cshtml", null)
+    @Html.Partial("~/Views/Report/_InputScript.cshtml", null)
+}
+
+@section AdditionalFooterScript
+{
+    <script type="text/javascript" src="@Url.Content("~/Assets/bower_components/datatables.net/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Assets/plugins/timepicker/bootstrap-timepicker.min.js")"></script>
+
+    <script id="DataTableScript">
+
+        function ResetFilter() {
+            $("#txtKeyword").val("");
+            RefreshDataTable("tblCheckInReportList");
+        }
+
+        $(document).ready(function () {
+            $("#mdlInputDialog").width("100%");
+            fLoadUserList();
+        });
+
+        function fLoadUserList() {
+            $('#tblCheckInReportList').DataTable({
+                "ajax": {
+                    "url": "@Url.Action("CheckInReportListAsync", "Report")",
+                    "type": "POST",
+                    "data": function (d) {
+                        d.p_sKeyword = $("#txtKeyword").val();
+                    },
+                },
+                "columns": [
+                    {
+                        "title": "Id",
+                        "data": "idUangJalan",
+                        className: "hidden",
+                    },  
+                    {
+                        "title": "Action",
+                        "width": "15%",
+                        className: "dt-col-center",
+                        render: function (d) {
+                            var sReturn = '';
+                                sReturn += "<a onclick = 'fShowDetail(this)' class='btn btn-success btn-sm btn-flat fa fa-eye'></a> ";
+                            return sReturn;
+                        },
+                    },
+                    {
+                        "title": "Nama Partner",
+                        "data": "partnerName",
+                        "width": "15%",
+                    },
+                    {
+                        "title": "Kode Uang Jalan",
+                        "data": "kodeUangJalan",
+                        "width": "15%",
+                    },
+                    {
+                        "title": "Nama Crew",
+                        "data": "crewName",
+                        "width": "15%",
+                    },
+                    {
+                        "title": "Jabatan Crew",
+                        "data": "checkPointActor",
+                        "width": "15%",
+                    },
+                    {
+                        "title": "Status Pembayaran",
+                        "data": "paymentStatusName",
+                        "width": "15%",
+                    },
+                    {
+                        "title": "Harga",
+                        "data": "harga",
+                        "width": "15%",
+                        render: function (d) {
+                            return fFormatNumber(parseFloat(d).toFixed(2));
+                        },
+                    },
+                ],
+                "processing": true,
+                "serverSide": true,
+                "lengthMenu": [[10, 20, 50, 100], [10, 20, 50, 100]],
+                "filter": false,
+                "sort": false,
+                "orderMulti": false
+            });
+        };
+
+    </script>
+}

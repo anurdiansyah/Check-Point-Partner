@@ -1,0 +1,83 @@
+﻿@using Microsoft.Extensions.Options;
+@using TTIS.WebUi.Configuration;
+@inject IOptions<TtsiApi> ttsiApi
+
+<script id="InputScript">
+
+    function fShowDetail(senderButton) {
+        window.FakeLoader.init();
+        var row = $(senderButton).closest("TR");
+        var iId = $("TD", row).eq(0).html();
+
+        $("#frmInput").find("select, input, textarea").each(function () {
+            $(this).attr("readonly", true);
+            $(this).attr("disabled", true);
+        });
+
+
+        Get(iId, "Detail");
+    }
+
+    function Get(p_iId, p_sActionName) {
+        try {
+            $.ajax({
+                url: '@Url.Action("GetCheckInDetail", "Report")',
+                type: "POST",
+                data: { p_iId: p_iId },
+                success: function (data) {
+                    if (data["isSuccess"]) {
+                        var obj = jQuery.parseJSON(data["jsonData"]);
+
+                        $("#dvCheckPointReport").find("select, input, textarea").each(function () {
+                            if (this.name.toLowerCase().indexOf('date') > -1) {
+                                var date = new Date(obj[this.name]);
+                                $("#" + this.name).val(moment(date).format("DD MMMM YYYY - HH:mm:ss").replace(" - 00:00:00", ""))
+                            }
+                            else if (this.name.toLowerCase().indexOf('harga') > -1) {
+                                $("#" + this.name).val(fFormatNumber(parseFloat(obj[this.name]).toFixed(2)))
+                            }
+                            else {
+                                $("#" + this.name).val(obj[this.name])
+                            }
+
+                            $("#imgCheckIn").attr("src", "@ttsiApi.Value.ApiUrl/images/CheckInImage?Id=" + obj.CheckInPhotoId);
+
+                        });
+
+                        OpenModalInput(p_sActionName)
+                    } else {
+                        swal({
+                            title: "Oops, Something wrong with your Request\n\n Reference Number : " + data["referenceNumber"] + "\n\n",
+                            text: "Please safe the Reference Number and call your System Administrator.",
+                            type: 'warning'
+                        })
+                    }
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: window.location.href,
+                        text: "( Error " + xhr.status + " ) - " + error,
+                        type: 'warning'
+                    }).then(function () {
+                        CloseModalInput('tblCheckInReportList');
+                    })
+                }
+            });
+        }
+        catch (err) {
+            swal({
+                title: 'From Catch',
+                text: err.message,
+                type: 'warning'
+            }).then(function () {
+                CloseModalInput('tblCheckInReportList');
+            })
+        }
+    };
+
+    function fClose() {
+        CloseModalInput('tblCheckInReportList');
+        RefreshDataTable('tblRoleAccess');
+    }
+
+</script>

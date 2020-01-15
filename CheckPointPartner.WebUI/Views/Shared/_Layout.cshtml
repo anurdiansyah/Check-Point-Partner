@@ -1,0 +1,205 @@
+﻿@using CheckPointPartner.WebUI.Services;
+@using CheckPointPartner.WebUI.Model;
+@inject IAppUser appUser
+@{
+    IUsers currentUser = appUser.CurrentUser();
+    string sUserImage = string.IsNullOrEmpty(currentUser.UserDetail.UserImage) ? "no_photo.png" : currentUser.UserDetail.UserImage + ".jpeg";
+    string sPartnerImage = string.IsNullOrEmpty(currentUser.UserDetail.PartnerImage) ? "no_photo.png" : currentUser.UserDetail.PartnerImage + ".jpeg";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+
+    <link href="~/Assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/Assets/bower_components/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link href="~/Assets/bower_components/Ionicons/css/ionicons.css" rel="stylesheet" />
+    <link href="~/Assets/dist/css/skins/_all-skins.css" rel="stylesheet" />
+    <link href="~/Assets/bower_components/morris.js/morris.css" rel="stylesheet" />
+    <link href="~/Assets/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.css" rel="stylesheet" />
+    <link href="~/Assets/bower_components/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet" />
+    <link href="~/Assets/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.css" rel="stylesheet" />
+    <link href="~/Assets/plugins/fakeloader/fakeloader.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic" rel="stylesheet">
+    <link href="~/Assets/dist/css/Tsc.css" rel="stylesheet">
+
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/Assets/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+    @RenderSection("AdditionalHeaderScript", required: false)
+
+    <style>
+        body, div, ul, li, button, label, a, p, table {
+            font-size: 11pt !important;
+        }
+    </style>
+</head>
+
+
+
+<body class="hold-transition skin-black-light sidebar-mini">
+    <div class="wrapper">
+
+        <header class="main-header">
+            <a href="@Url.Action("Index", "Dashboard")" class="logo">
+
+                <div class="logo-mini">
+                    <img src="@Url.Content("~/Assets/dist/img/images/gitterns.png")" style="width: 50px; padding: 5px;" alt="User Image">
+                </div>
+
+                <div class="logo-lg">
+                    <div class="pull-left">
+                        <img src="@Url.Content("~/Assets/dist/img/images/gitterns.png")" style="width: 50px; padding: 5px;" alt="User Image" />
+                    </div>
+                    <div style="margin-left : 25%; padding:10px; text-align:left;">
+                        <h3 style="margin : 0%;">
+                            <b>GiTT</b>erns
+                        </h3>
+                    </div>
+                </div>
+            </a>
+
+            <nav class="navbar navbar-static-top">
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">
+                        Toggle navigation
+                    </span>
+                </a>
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img src="@Url.Content("~/Assets/dist/img/user/" + sUserImage)" class="user-image" alt="User Image">
+                                <span class="hidden-xs">
+                                    &nbsp;@currentUser.UserDetail.Name
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="user-header">
+                                    <img src="@Url.Content("~/Assets/dist/img/user/" + sUserImage)" class="img-circle" alt="User Image">
+                                    <p>
+                                        &nbsp;@currentUser.UserDetail.Name
+                                    </p>
+                                </li>
+                                <li class="user-footer">
+                                    <div style="float:left;">
+                                        <a href="@Url.Action("Index", "Profile")" class="btn btn-default btn-flat">Profile</a>
+                                    </div>
+                                    <div style="float:right;">
+                                        <a href="@Url.Action("Logout", "Account")" class="btn btn-default btn-flat">Log Out</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+        </header>
+
+        <aside class="main-sidebar">
+            <section class="sidebar">
+
+                <div class="user-panel">
+                    <img src="@Url.Content("~/Assets/dist/img/user/" + sUserImage)" class="img-circle" alt="User Image" style="width:50px!important; height:50px!important; border:3px solid gainsboro">
+                    <a class="pull-left info">
+                        <p>
+                            @currentUser.UserDetail.Name
+                        </p>
+                        <p href="#">
+                            @(string.IsNullOrEmpty(currentUser.UserDetail.PartnerName) ? "- No Partner -" : currentUser.UserDetail.PartnerName)
+                        </p>
+                    </a>
+                </div>
+
+                <ul id="mnuSideBar" class="sidebar-menu" data-widget="tree">
+                    <li class="header">Menu Navigation</li>
+                    <li>
+                        <a href="@Url.Action("Index", "Dashboard")" id="liDashboard">
+                            <i class="fa fa-dashboard"></i><span>
+                                Dashboard
+                            </span>
+                        </a>
+                    </li>
+                    @if (this.User.IsInRole("Administrator"))
+                    {
+                        <li>
+                            <a href="@Url.Action("Index", "Users")" id="liDashboard">
+                                <i class="fa fa-group"></i><span>
+                                    Users
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Index", "Report")" id="liDashboard">
+                                <i class="fa fa-file-text-o"></i><span>
+                                    Report
+                                </span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+            </section>
+        </aside>
+
+        <div class="content-wrapper">
+            <div id="dvTester"></div>
+            @try
+            {
+                @RenderBody()
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        </div>
+    </div>
+
+    <div id="fakeloader-overlay" class="visible incoming">
+        <div class="loader-wrapper-outer">
+            <div class="loader-wrapper-inner">
+                <div class="loader"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="Preloader_Javascript">
+        <script src="~/Assets/bower_components/jquery/dist/jquery.js"></script>
+        <script src="~/Assets/bower_components/jquery-ui/jquery-ui.js"></script>
+        <script src="~/Assets/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/Assets/bower_components/raphael/raphael.js"></script>
+        <script src="~/Assets/bower_components/morris.js/morris.js"></script>
+        <script src="~/Assets/bower_components/jquery-sparkline/dist/jquery.sparkline.js"></script>
+        <script src="~/Assets/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+        <script src="~/Assets/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"></script>
+        <script src="~/Assets/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js"></script>
+        <script src="~/Assets/bower_components/jquery-slimscroll/jquery.slimscroll.js"></script>
+        <script src="~/Assets/bower_components/fastclick/lib/fastclick.js"></script>
+        <script src="~/Assets/bower_components/moment/moment.js"></script>
+        <script src="~/Assets/bower_components/swal/sweetalert2.js"></script>
+        <script src="~/Assets/dist/js/adminlte.js"></script>
+        <script src="~/Assets/dist/js/RDHelper.js"></script>
+        <script src="~/Assets/plugins/fakeloader/fakeloader.min.js"></script>
+
+        @RenderSection("AdditionalFooterScript", required: false)
+    </div>
+
+    <div id="dvModal">
+        <div class="modal modal-default fade" id="mdlInput" data-backdrop="static" data-keyboard="false">
+            <div id="mdlInputDialog" class="modal-dialog modal-lg">
+                <div class="modal-content" style="padding:20px!important; margin:20px!important">
+                    @RenderSection("mdlInput", required: false)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @{
+        @Html.Partial("~/Views/Shared/_LayoutScript.cshtml", null)
+    }
+</body>
+</html>

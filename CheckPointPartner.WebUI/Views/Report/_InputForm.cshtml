@@ -1,0 +1,188 @@
+﻿@using CheckPointPartner.WebUI.Data;
+@using CheckPointPartner.WebUI.Model;
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Identity;
+
+@inject IHttpContextAccessor HttpContextAccessor
+@inject UsersContext _userContext
+
+@model CheckInReport
+@{
+    ViewBag.Title = "User";
+}
+
+
+<div class="modal-header">
+    <div class="box-body">
+        <h3>
+            <i class="fa fa-user"></i>&nbsp;&nbsp;<span id="spnActionName"></span> @ViewBag.Title
+        </h3>
+    </div>
+</div>
+
+<div class="modal-body" style="max-height: calc(100vh - 240px) !important; overflow-y: auto !important;">
+    <div class="row">
+
+        <div class="col-md-12" id="dvCheckPointReport">
+            @Html.HiddenFor(model => model.IdUangJalan)
+
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="box box-primary">
+                        <div class="box-header" style="padding-top:0px!important">
+                            <h4><b>Detail Check In</b></h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label>
+                                        Check In Photo
+                                    </label>
+                                    <img class="profile-user-img img-responsive" id="imgCheckIn" style="width:100% !important; margin-bottom:10px !important" src="@Url.Content("~/Assets/dist/img/default/no_photo.png")" alt="CheckIn Photo">
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <div class="form-group col-md-12">
+                                        <label>Nama</label>
+                                        @Html.TextBoxFor(model => model.CrewName, new { @class = "form-control", @readonly = "true" })
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label>Jabatan</label>
+                                        @Html.TextBoxFor(model => model.CheckPointActor, new { @class = "form-control", @readonly = "true" })
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label>Lokasi Check In</label>
+                                        @Html.TextBoxFor(model => model.PartnerName, new { @class = "form-control", @readonly = "true" })
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label>Waktu Check In</label>
+                                        @Html.TextBoxFor(model => model.CheckPointDate, new { @class = "form-control", @readonly = "true" })
+                                    </div>
+                                    <div class="form-group col-md-12">
+                                        <label>Harga</label>
+                                        @Html.TextBoxFor(model => model.Harga, new { @class = "form-control", @readonly = "true" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="box box-primary">
+                        <div class="box-header" style="padding-top:0px!important">
+                            <h4><b>Detail Uang Jalan</b></h4>
+                        </div>
+                        <div class="box-body">
+                            <div class="row">
+                                <div class="form-group col-md-4">
+                                    <label>Kode Uang Jalan</label>
+                                    @Html.TextBoxFor(model => model.KodeUangJalan, new { @class = "form-control", @readonly = "true" })
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Tanggal Transaksi</label>
+                                    @Html.TextBoxFor(model => model.TranDateUangJalan, new { @class = "form-control", @readonly = "true" })
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label>Status</label>
+                                    @Html.TextBoxFor(model => model.StatusUangJalan, new { @class = "form-control", @readonly = "true" })
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label>Nama Customer</label>
+                                    @Html.TextBoxFor(model => model.CustomerName, new { @class = "form-control", @readonly = "true" })
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Total Muatan</label>
+                                    @Html.TextBoxFor(model => model.TotalMuatan, new { @class = "form-control", @readonly = "true" })
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <div class="box box-primary">
+                                        <div class="box-header" style="padding-top:0px!important">
+                                            <h4><b>Detail Muat</b></h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="row">
+                                                <div class="form-group col-md-12">
+                                                    <label>Lokasi</label>
+                                                    @Html.TextBoxFor(model => model.LokasiMuatName, new { @class = "form-control", @readonly = "true" })
+                                                </div>
+                                                <div class="form-group col-md-12">
+                                                    <label>Alamat</label>
+                                                    @Html.TextAreaFor(model => model.AlamatMuat, new { @class = "form-control", @readonly = "true" })
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label>PIC</label>
+                                                    @Html.TextBoxFor(model => model.PicMuat, new { @class = "form-control", @readonly = "true" })
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label>Telp PIC</label>
+                                                    @Html.TextBoxFor(model => model.PicMuatPhone, new { @class = "form-control", @readonly = "true" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <div class="box box-primary">
+                                        <div class="box-header" style="padding-top:0px!important">
+                                            <h4><b>Detail Bongkar</b></h4>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="row">
+                                                <div class="form-group col-md-12">
+                                                    <label>Lokasi</label>
+                                                    @Html.TextBoxFor(model => model.LokasiBongkarName, new { @class = "form-control", @readonly = "true" })
+                                                </div>
+                                                <div class="form-group col-md-12">
+                                                    <label>Alamat</label>
+                                                    @Html.TextAreaFor(model => model.AlamatBongkar, new { @class = "form-control", @readonly = "true" })
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label>PIC</label>
+                                                    @Html.TextBoxFor(model => model.PicBongkar, new { @class = "form-control", @readonly = "true" })
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label>Telp PIC</label>
+                                                    @Html.TextBoxFor(model => model.PicBongkarPhone, new { @class = "form-control", @readonly = "true" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <div class="form-group col-md-12" style="text-align:right !important;">
+        <button type="button" class="btn btn-default btn-flat" style="width:20% !important; margin-left:4px;" onclick="fClose()">
+            <i class="fa fa-close"></i> &nbsp; Close
+        </button>
+    </div>
+</div>
+
+<script>
+
+    $('#mdlInput').on('shown.bs.modal', function () {
+        try {
+
+        }
+        catch (err) {
+            swal({
+                title: 'From Catch',
+                text: err.message,
+                type: 'warning'
+            }).then(function () {
+                fClose()
+            })
+        }
+    });
+
+</script>

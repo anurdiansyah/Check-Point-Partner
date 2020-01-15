@@ -1,0 +1,207 @@
+﻿@using CheckPointPartner.WebUI.Data;
+@using CheckPointPartner.WebUI.Model;
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Identity;
+
+@inject IHttpContextAccessor HttpContextAccessor
+@inject UsersContext _userContext
+
+@model IUsers
+@{
+    ViewBag.Title = "User";
+
+    List<SelectListItem> lstPartners = new List<SelectListItem>();
+    lstPartners.Add(new SelectListItem { Value = "", Text = "- Not A Partner -" });
+    foreach (var oRoles in _userContext.Partners.ToList())
+    {
+        lstPartners.Add(new SelectListItem { Value = oRoles.PartnerId.ToString(), Text = oRoles.PartnerName });
+    }
+
+    List<SelectListItem> lstRoles = new List<SelectListItem>();
+    lstRoles.Add(new SelectListItem { Value = "", Text = "- Select One -" });
+    foreach (var oRoles in _userContext.iRoles.ToList())
+    {
+        lstRoles.Add(new SelectListItem { Value = oRoles.Id.ToString(), Text = oRoles.Name });
+    }
+}
+
+@using (Html.BeginForm("Save", "Users", FormMethod.Post, new { id = "frmInput", enctype = "multipart/form-data", autocomplete = "off" }))
+{
+    <div class="modal-header">
+        <div class="box-body">
+            <h3>
+                <i class="fa fa-user"></i>&nbsp;&nbsp;<span id="spnActionName"></span> @ViewBag.Title
+            </h3>
+        </div>
+    </div>
+
+    <div class="modal-body" style="max-height: calc(100vh - 240px) !important; overflow-y: auto !important;">
+        <div class="row">
+
+            <div class="col-md-6" id="dvUser">
+                @Html.HiddenFor(model => model.Id)
+                <div class="box box-primary">
+                    <div class="box-header" style="padding-top:0px!important">
+                        <h4><b>Informasi Login</b></h4>
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group col-md-6">
+                            <label>User Name</label>
+                            @Html.TextBoxFor(model => model.UserName, new { @placeholder = "Username", @class = "form-control", @readonly = "true", @required = true, maxlength = 100 })
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>E-mail</label>
+                            @Html.TextBoxFor(model => model.Email, new { @placeholder = "E-mail", @class = "form-control", @readonly = "true", @required = true, @type = "email" })
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label>Telephone Partner</label>
+                            @Html.TextBoxFor(model => model.PhoneNumber, new { @placeholder = "Phone Number", @class = "form-control", @readonly = "true", @required = true, maxlength = 16 })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6" id="dvUserDetail">
+                @Html.HiddenFor(model => model.UserDetail.UserDetailId)
+                @Html.HiddenFor(model => model.UserDetail.AspNetUserId)
+                @Html.HiddenFor(model => model.UserDetail.IsActive)
+                @Html.HiddenFor(model => model.UserDetail.IsDeleted)
+                @Html.HiddenFor(model => model.UserDetail.CreateDate)
+                @Html.HiddenFor(model => model.UserDetail.CreateByUserId)
+
+                <div class="box box-primary">
+                    <div class="box-header" style="padding-top:0px!important">
+                        <h4><b>Detail User</b></h4>
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group col-md-8">
+                            <label>Nama Pemegang Akun</label>
+                            @Html.TextBoxFor(model => model.UserDetail.Name, new { @placeholder = "Nama Pemegang Akun", @class = "form-control", @readonly = "true", @required = true })
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label>Telephone Pemegang Akun</label>
+                            @Html.TextBoxFor(model => model.UserDetail.PhoneNumber, new { @placeholder = "Phone Number", @class = "form-control", @readonly = "true", @required = true })
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label>Nama Partner</label>
+                            @Html.DropDownListFor(model => model.UserDetail.PartnerId, lstPartners, new { @class = "form-control", @readonly = "true" })
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label>Alamat Partner</label>
+                            @Html.TextAreaFor(model => model.UserDetail.PartnerAddress, new { @placeholder = "Alamat", @class = "form-control", @readonly = "true" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12" id="dvRoleAccess">
+                <div class="box box-primary">
+                    <div class="box-header" style="padding-top:0px!important">
+                        <h4><b>Role Access</b></h4>
+                        <div class="row" id="dvNewRole">
+                            <div class="col-md-9" style="padding-right:0!important">
+                                @Html.DropDownList("ddlRoleAccess", lstRoles, new { @class = "form-control" })
+                            </div>
+                            <div class="col-md-3" style="padding-left:0!important">
+                                <button id="btnAddRole" type="button" class="btn btn-primary btn-flat" onclick="fAddRole()" style="width:100% !important;">
+                                    <i class="fa fa-plus"></i> &nbsp; Add Role
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group col-md-12 no-padding">
+                            <table id="tblRoles"
+                                   style="width:100%"
+                                   class="table table-bordered table-striped dataTable no-footer"
+                                   role="grid"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <div class="form-group col-md-12" style="text-align:right !important;">
+            <button id="btnSubmit" type="submit" class="btn btn-success btn-flat" style="width:20% !important; margin-right:4px;">
+                <i class="fa fa-close"></i> &nbsp; Save
+            </button>
+
+            <button type="button" class="btn btn-default btn-flat" style="width:20% !important; margin-left:4px;" onclick="fClose()">
+                <i class="fa fa-close"></i> &nbsp; Close
+            </button>
+        </div>
+    </div>
+
+    <script>
+
+        $('#mdlInput').on('shown.bs.modal', function () {
+            try {
+                RefreshDataTable('tblRoles');
+
+                $('#JoinDate').datepicker({
+                    autoclose: true,
+                    format: 'dd MM yyyy'
+                });
+                $('#BirthDate').datepicker({
+                    autoclose: true,
+                    format: 'dd MM yyyy'
+                });
+                $('#LicenseExpiryDate').datepicker({
+                    autoclose: true,
+                    format: 'dd MM yyyy'
+                });
+            }
+            catch (err) {
+                swal({
+                    title: 'From Catch',
+                    text: err.message,
+                    type: 'warning'
+                }).then(function () {
+                    fClose()
+                })
+            }
+        });
+
+        $('#frmInput').submit(function (e) {
+            e.preventDefault();
+
+            var serializedForm = $(this).serialize();
+             $.ajax({
+                url: '@Url.Action("Save", "Users")',
+                type: "POST",
+                data: serializedForm,
+                success: function (data) {
+                    if (data["isSuccess"]) {
+                        swal({
+                            title: "Success...",
+                            text: data["message"],
+                            type: 'warning'
+                        }).then(function () {
+                            CloseModalInput('tblAspNetUsersList');
+                        })
+                    } else {
+                        swal({
+                            title: "Oops, Something wrong with your Request\n\n Reference Number : " + data["referenceNumber"] + "\n\n",
+                            text: "Please safe the Reference Number and call your System Administrator.",
+                            type: 'warning'
+                        })
+                    }
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: window.location.href,
+                        text: "( Error " + xhr.status + " ) - " + error,
+                        type: 'warning'
+                    }).then(function () {
+                        CloseModalInput('tblUsersList');
+                    })
+                }
+            });
+            return false;
+        });
+
+    </script>
+}
